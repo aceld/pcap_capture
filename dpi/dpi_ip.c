@@ -9,7 +9,7 @@ void dpi_pkt_ip(dpi_result *res, dpi_pkt *pkt)
     //ip 版本号为4
 
     if (pkt->ip_packet->version != 4) {
-        printf("IP version not eq 4\n");
+        DPI_LOG_ERROR("IP version not eq 4\n");
         return ;
     }
 
@@ -21,7 +21,7 @@ void dpi_pkt_ip(dpi_result *res, dpi_pkt *pkt)
     
     //分片只处理第一个分片 frag_off 网络字节序的后13位 == 0
     if ((pkt->ip_packet->frag_off & htons(0x01fff)) != 0) {
-        printf("IP frag off not eq 0\n"); 
+        DPI_LOG_ERROR("IP frag off not eq 0\n"); 
         return ;
     }
 

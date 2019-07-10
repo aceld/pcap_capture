@@ -5,7 +5,7 @@
 
 void usage(const char *argv0) 
 {
-    fprintf(stderr, "usage : %s <pcap_file>\n", argv0);
+    DPI_LOG_INFO("usage : %s <pcap_file>\n", argv0);
 }
 
 
@@ -32,7 +32,7 @@ int main(int argc, char *argv[])
     //1 初始化
     dpi_result *res = dpi_init(argv[1]);
     if (!res) {
-        fprintf(stderr, "Errr in dpi_init\n");
+        DPI_LOG_ERROR("Errr in dpi_init\n");
         return -1;
     }
 

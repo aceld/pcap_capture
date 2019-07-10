@@ -17,7 +17,7 @@ dpi_result *dpi_init(const char *pcapfile)
     pcap_t *handle = pcap_open_offline(pcapfile, errbuf);
     if (!handle) {
         //出错处理
-        fprintf(stderr, "Error in pcap_open_offline :%s\n", errbuf);
+        DPI_LOG_ERROR("Error in pcap_open_offline :%s\n", errbuf);
         return NULL;
     }
 
