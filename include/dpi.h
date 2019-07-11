@@ -4,7 +4,22 @@
 #include <arpa/inet.h>
 #include <net/ethernet.h>
 #include <netinet/ip.h>
+#include <netinet/tcp.h>
 #include "utils.h"
+
+
+
+
+
+
+//tcp应用层协议索引号
+typedef enum _dpi_protocol_tcp
+{
+    SSH = 0,
+    TFTP,
+    PROTOCOL_TCP_MAX
+}dpi_protocol_tcp;
+
 
 
 //句柄定义
@@ -19,7 +34,8 @@ typedef struct dpi_result
     unsigned int tcp_count;   //tcp  报文数量
     unsigned int udp_count;   //udp  报文数量
 
-    unsigned int ssh_count;   //ssh报文数量
+    //unsigned int ssh_count;   //ssh报文数量
+    unsigned int tcp_protocol_count[PROTOCOL_TCP_MAX];
 
 }dpi_result;
 
@@ -36,13 +52,17 @@ typedef struct dpi_pkt
     union {
         struct {
             uint32_t tcp_len; //tcp报文长度
-            char *tcp_packet; //tcp报文地址
+            struct tcphdr *tcp_packet; //tcp报文地址
         };
         struct {
             uint32_t udp_len; //udp报文长度
             char *udp_packet; //udp报文地址
         };
     };
+
+    uint8_t *payload;       //报文装载的数据区域
+    uint32_t payload_len;   //报文装载的数据区域长度
+
 }dpi_pkt;
 
 
@@ -75,3 +95,21 @@ void dpi_pkt_udp(dpi_result *res, dpi_pkt *pkt);
 
 //处理icmp报文
 //void dpi_pkt_icmp(dpi_result *res, dpi_pkt *pkt);
+
+//处理ssh报文
+int dpi_pkt_ssh(dpi_result *res, dpi_pkt *pkt);
+
+//处理tftp报文
+int dpi_pkt_tftp(dpi_result *res, dpi_pkt *pkt);
+
+
+
+/* 处理tcp应用层报文的解析函数表 */
+//定义一个函数指针，专门用来识别协议报文
+typedef int (*dpi_protocol_analyze_func_t)(dpi_result *res, dpi_pkt *pkt);
+
+
+//tcp应用层报文解析函数表
+dpi_protocol_analyze_func_t dpi_tcp_analyze_funcs[PROTOCOL_TCP_MAX];
+
+

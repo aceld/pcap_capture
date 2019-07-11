@@ -11,11 +11,20 @@ void usage(const char *argv0)
 
 void displayResult(dpi_result *res)
 {
+    //链路层
     printf("以太坊报文数量: %u\n", res->ether_count);
+
+    //IP层
     printf("IP报文数量: %u\n", res->ip_count);
+
+
+    //传输层
     printf("TCP报文数量: %u\n", res->tcp_count);
     printf("UDP报文数量: %u\n", res->udp_count);
-    printf("SSH报文数量: %u\n", res->ether_count);
+
+    //tcp应用协议
+    printf("SSH报文数量: %u\n", res->tcp_protocol_count[SSH]);
+    printf("TFTP报文数量: %u\n", res->tcp_protocol_count[TFTP]);
 }
 
 

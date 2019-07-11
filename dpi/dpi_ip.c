@@ -27,21 +27,27 @@ void dpi_pkt_ip(dpi_result *res, dpi_pkt *pkt)
 
     //根据ip报文是什么协议来进行分支
     switch(pkt->ip_packet->protocol) {
-        case 6:
+        case IPPROTO_TCP: //6
             //tcp
             //计算tcp报文数据的长度和起始位置
             pkt->tcp_len = ip_totlen - ihl;
-            pkt->tcp_packet = (char*)pkt->ip_packet + ihl;
+            pkt->tcp_packet = (struct tcphdr*)((char*)pkt->ip_packet + ihl);
+            if (pkt->tcp_len <= 0) {
+                return;
+            }
 
             //处理tcp报文
             dpi_pkt_tcp(res, pkt);
 
             break;
-        case 17:
+        case IPPROTO_UDP: //17
             //udp
             //计算udp报文数据的长度和起始位置
             pkt->udp_len = ip_totlen - ihl;
             pkt->udp_packet = (char*)pkt->ip_packet + ihl;
+            if (pkt->udp_len <= 0) {
+                return;
+            }
 
             //处理udp报文
             dpi_pkt_udp(res, pkt);
