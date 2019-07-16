@@ -7,7 +7,8 @@ char *protocol_udp_string[PROTOCOL_UDP_MAX] = {
 //实现 udp应用层报文解析函数表
 dpi_protocol_analyze_func_t  dpi_udp_analyze_funcs[PROTOCOL_UDP_MAX] = 
 {
-    dpi_pkt_tftp
+    dpi_pkt_tftp,
+    dpi_pkt_ntp
 };
 
 //处理udp报文

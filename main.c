@@ -25,7 +25,10 @@ void displayResult(dpi_result *res)
 
     //tcp应用协议
     printf("SSH报文数量: %u\n", res->tcp_protocol_count[SSH]);
+
+    //udp应用协议
     printf("TFTP报文数量: %u\n", res->udp_protocol_count[TFTP]);
+    printf("NTP报文数量: %u\n", res->udp_protocol_count[NTP]);
 
 
     //链接信息

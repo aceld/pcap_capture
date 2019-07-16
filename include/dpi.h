@@ -29,12 +29,14 @@ extern char *protocol_tcp_string[PROTOCOL_TCP_MAX];
 typedef enum _dpi_udp_protocol
 {
     TFTP = 0,
+    NTP,
     PROTOCOL_UDP_MAX
 }dpi_udp_protocol;
 
 
 #define PROTOC_UDP_STRING   \
-        "TFTP"
+        "TFTP",             \
+        "NTP"
 
 extern char *protocol_udp_string[PROTOCOL_UDP_MAX];
 
@@ -150,6 +152,9 @@ int dpi_pkt_ssh(dpi_result *res, dpi_pkt *pkt);
 
 //处理tftp报文
 int dpi_pkt_tftp(dpi_result *res, dpi_pkt *pkt);
+
+//处理ntp报文
+int dpi_pkt_ntp(dpi_result *res, dpi_pkt *pkt);
 
 //处理http报文
 int dpi_pkt_http(dpi_result *res, dpi_pkt *pkt);
