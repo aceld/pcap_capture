@@ -5,22 +5,38 @@
 #include <net/ethernet.h>
 #include <netinet/ip.h>
 #include <netinet/tcp.h>
+#include <netinet/udp.h>
 #include "utils.h"
 
 
 
 //tcp应用层协议索引号
-typedef enum _dpi_protocol
+typedef enum _dpi_tcp_protocol
 {
     SSH = 0,
-    TFTP,
-    PROTOCOL_MAX
-}dpi_protocol;
+    HTTP,
+    PROTOCOL_TCP_MAX
+}dpi_tcp_protocol;
 
 
-#define PROTOC_STRING   \
+#define PROTOC_TCP_STRING   \
         "SSH",          \
+        "HTTP"
+
+extern char *protocol_tcp_string[PROTOCOL_TCP_MAX];
+
+//udp应用层协议索引号
+typedef enum _dpi_udp_protocol
+{
+    TFTP = 0,
+    PROTOCOL_UDP_MAX
+}dpi_udp_protocol;
+
+
+#define PROTOC_UDP_STRING   \
         "TFTP"
+
+extern char *protocol_udp_string[PROTOCOL_UDP_MAX];
 
 
 //句柄定义
@@ -35,8 +51,8 @@ typedef struct dpi_result
     unsigned int tcp_count;   //tcp  报文数量
     unsigned int udp_count;   //udp  报文数量
 
-    //unsigned int ssh_count;   //ssh报文数量
-    unsigned int tcp_protocol_count[PROTOCOL_MAX];
+    unsigned int tcp_protocol_count[PROTOCOL_TCP_MAX];
+    unsigned int udp_protocol_count[PROTOCOL_UDP_MAX];
 
 }dpi_result;
 
@@ -55,7 +71,7 @@ typedef struct dpi_pkt
     struct tcphdr *tcp_packet; //tcp报文地址
 
     uint32_t udp_len; //udp报文长度
-    char *udp_packet; //udp报文地址
+    struct udphdr *udp_packet; //udp报文地址
 
     uint8_t *payload;       //报文装载的数据区域
     uint32_t payload_len;   //报文装载的数据区域长度
@@ -82,7 +98,7 @@ typedef struct dpi_connection {
 
 
 //对已经探测到的协议报文，保存IP+port 的链接信息
-int add_connection(struct dpi_result *res, struct dpi_pkt *pkt, dpi_protocol protocol);
+int add_connection(struct dpi_result *res, struct dpi_pkt *pkt, dpi_tcp_protocol protocol);
 
 /*
    ip + port 的比较，比较保存的当前的报文的ip_pair是否相同
@@ -91,7 +107,7 @@ int add_connection(struct dpi_result *res, struct dpi_pkt *pkt, dpi_protocol pro
         0: 相同
         1: 不同
  */
-int cmp_connection(struct dpi_result *res, struct dpi_pkt *pkt, dpi_protocol protocol);
+int cmp_connection(struct dpi_result *res, struct dpi_pkt *pkt, dpi_tcp_protocol protocol);
 
 
 
@@ -135,6 +151,9 @@ int dpi_pkt_ssh(dpi_result *res, dpi_pkt *pkt);
 //处理tftp报文
 int dpi_pkt_tftp(dpi_result *res, dpi_pkt *pkt);
 
+//处理http报文
+int dpi_pkt_http(dpi_result *res, dpi_pkt *pkt);
+
 
 
 /* 处理tcp应用层报文的解析函数表 */
@@ -143,6 +162,9 @@ typedef int (*dpi_protocol_analyze_func_t)(dpi_result *res, dpi_pkt *pkt);
 
 
 //tcp应用层报文解析函数表
-dpi_protocol_analyze_func_t dpi_tcp_analyze_funcs[PROTOCOL_MAX];
+dpi_protocol_analyze_func_t dpi_tcp_analyze_funcs[PROTOCOL_TCP_MAX];
 
+
+//udp应用层报文解析函数表
+dpi_protocol_analyze_func_t dpi_udp_analyze_funcs[PROTOCOL_UDP_MAX];
 

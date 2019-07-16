@@ -6,15 +6,12 @@
 #include <stdlib.h>
 #include <string.h>
 
-static char *protocol_string[PROTOCOL_MAX] = {
-    PROTOC_STRING
-};
 
 
 
 //定义全局的链接协议链接集合
-//static struct dpi_connection g_connections[PROTOCOL_MAX];
-static dpi_list *g_connections[PROTOCOL_MAX];
+//static struct dpi_connection g_connections[PROTOCOL_TCP_MAX];
+static dpi_list *g_connections[PROTOCOL_TCP_MAX];
 
 
 /* -------------------------------------------*/
@@ -25,7 +22,7 @@ static dpi_list *g_connections[PROTOCOL_MAX];
 void init_connection_list() {
     int i;
 
-    for (i = 0; i < PROTOCOL_MAX; i ++) {
+    for (i = 0; i < PROTOCOL_TCP_MAX; i ++) {
         g_connections[i] = dpi_list_create();
     }
 }
@@ -39,7 +36,7 @@ void init_connection_list() {
 void destory_connection_list() {
     int i;
 
-    for (i = 0; i < PROTOCOL_MAX; i ++) {
+    for (i = 0; i < PROTOCOL_TCP_MAX; i ++) {
         dpi_list_destory(g_connections[i]);
     }
 }
@@ -48,7 +45,7 @@ void destory_connection_list() {
 
 
 //对已经探测到的协议报文，保存IP+port 的链接信息
-int add_connection(struct dpi_result *res, struct dpi_pkt *pkt, dpi_protocol protocol) 
+int add_connection(struct dpi_result *res, struct dpi_pkt *pkt, dpi_tcp_protocol protocol) 
 {
     int ret = 0;
 
@@ -70,13 +67,7 @@ int add_connection(struct dpi_result *res, struct dpi_pkt *pkt, dpi_protocol pro
         con->ipv4.src_port = pkt->tcp_packet->source;
         con->ipv4.dst_port = pkt->tcp_packet->dest;
 
-    } else if(pkt->udp_packet != NULL) {
-        /* UDP */
-        
-    } else {
-        /* nothing to do */
     }
-
 
     //将链接添加对应协议的链表中
     dpi_list_append(g_connections[protocol], con);
@@ -91,7 +82,7 @@ int add_connection(struct dpi_result *res, struct dpi_pkt *pkt, dpi_protocol pro
         0: 相同
         1: 不同
  */
-int cmp_connection(struct dpi_result *res, struct dpi_pkt *pkt, dpi_protocol protocol)
+int cmp_connection(struct dpi_result *res, struct dpi_pkt *pkt, dpi_tcp_protocol protocol)
 {
     int ret = 1;
     
@@ -126,12 +117,7 @@ int cmp_connection(struct dpi_result *res, struct dpi_pkt *pkt, dpi_protocol pro
                         ret = 0;
                         goto END;
                     }
-                } else if (pkt->udp_packet != NULL) {
-                    // udp协议
-                    
-                } else {
-                    /* nothing to do */
-                }
+                } 
             }
         }
 #if 0
@@ -166,9 +152,9 @@ END:
 void show_connections()
 {
     int i; 
-    for (i = 0; i < PROTOCOL_MAX; i++) {
-        printf("=====================\n");
-        printf("protocol : %s\n", protocol_string[i]);
+    for (i = 0; i < PROTOCOL_TCP_MAX; i++) {
+        printf("========= TCP Connection =========\n");
+        printf("tcp protocol : %s\n", protocol_tcp_string[i]);
 
         dpi_list_node *node = g_connections[i]->head.next;
         while( node != &g_connections[i]->head) {

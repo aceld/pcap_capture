@@ -32,6 +32,7 @@ void dpi_pkt_ip(dpi_result *res, dpi_pkt *pkt)
             //计算tcp报文数据的长度和起始位置
             pkt->tcp_len = ip_totlen - ihl;
             pkt->tcp_packet = (struct tcphdr*)((char*)pkt->ip_packet + ihl);
+            //如果数据区域没有数据，跳过
             if (pkt->tcp_len <= 0) {
                 return;
             }
@@ -44,7 +45,8 @@ void dpi_pkt_ip(dpi_result *res, dpi_pkt *pkt)
             //udp
             //计算udp报文数据的长度和起始位置
             pkt->udp_len = ip_totlen - ihl;
-            pkt->udp_packet = (char*)pkt->ip_packet + ihl;
+            pkt->udp_packet = (struct udphdr*)((char*)pkt->ip_packet + ihl);
+            //如果数据区域没有数据，跳过
             if (pkt->udp_len <= 0) {
                 return;
             }
