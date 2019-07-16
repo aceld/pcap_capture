@@ -1,6 +1,6 @@
 include_directories(./include)
 file(GLOB SRC_LIST "./dpi/*.c")
 #add_executable(pcapc ./main.c ./dpi/dpi_ether.c ./dpi/dpi_ip.c ./dpi/dpi_tcp.c ./dpi/dpi_udp.c)
-add_executable(pcapc ./main.c ${SRC_LIST})
+add_executable(pcapc ./main.c ${SRC_LIST} ./utils/dpi_list.c)
 add_executable(testlist ./utils/dpi_list.c ./test/test_list.c)
 target_link_libraries(pcapc pcap)

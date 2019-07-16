@@ -3,6 +3,7 @@
 #include "dpi.h"
 
 
+
 void usage(const char *argv0) 
 {
     DPI_LOG_INFO("usage : %s <pcap_file>\n", argv0);
@@ -25,6 +26,10 @@ void displayResult(dpi_result *res)
     //tcp应用协议
     printf("SSH报文数量: %u\n", res->tcp_protocol_count[SSH]);
     printf("TFTP报文数量: %u\n", res->tcp_protocol_count[TFTP]);
+
+
+    //链接信息
+    show_connections();
 }
 
 

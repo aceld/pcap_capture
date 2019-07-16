@@ -1,7 +1,7 @@
 #include "dpi.h"
 
 //实现 tcp应用层报文解析函数表
-dpi_protocol_analyze_func_t  dpi_tcp_analyze_funcs[PROTOCOL_TCP_MAX] = 
+dpi_protocol_analyze_func_t  dpi_tcp_analyze_funcs[PROTOCOL_MAX] = 
 {
     dpi_pkt_ssh,
     dpi_pkt_tftp
@@ -32,7 +32,7 @@ void dpi_pkt_tcp(dpi_result *res, dpi_pkt *pkt)
     //表驱动法
     //将全部的回调函数放在一个全局表中,抽象出来
     int i;
-    for (i = 0; i < PROTOCOL_TCP_MAX; i++) {
+    for (i = 0; i < PROTOCOL_MAX; i++) {
         if (dpi_tcp_analyze_funcs[i](res, pkt)) {
             //匹配了对应的协议成功
             res->tcp_protocol_count[i]++;

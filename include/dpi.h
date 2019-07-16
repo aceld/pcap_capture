@@ -9,17 +9,18 @@
 
 
 
-
-
-
 //tcp应用层协议索引号
-typedef enum _dpi_protocol_tcp
+typedef enum _dpi_protocol
 {
     SSH = 0,
     TFTP,
-    PROTOCOL_TCP_MAX
-}dpi_protocol_tcp;
+    PROTOCOL_MAX
+}dpi_protocol;
 
+
+#define PROTOC_STRING   \
+        "SSH",          \
+        "TFTP"
 
 
 //句柄定义
@@ -35,7 +36,7 @@ typedef struct dpi_result
     unsigned int udp_count;   //udp  报文数量
 
     //unsigned int ssh_count;   //ssh报文数量
-    unsigned int tcp_protocol_count[PROTOCOL_TCP_MAX];
+    unsigned int tcp_protocol_count[PROTOCOL_MAX];
 
 }dpi_result;
 
@@ -49,22 +50,54 @@ typedef struct dpi_pkt
     struct ether_header *ether_packet; //以太坊报文地址
     uint32_t ip_len; //IP报文长度
     struct iphdr *ip_packet; //IP报文地址
-    union {
-        struct {
-            uint32_t tcp_len; //tcp报文长度
-            struct tcphdr *tcp_packet; //tcp报文地址
-        };
-        struct {
-            uint32_t udp_len; //udp报文长度
-            char *udp_packet; //udp报文地址
-        };
-    };
+
+    uint32_t tcp_len; //tcp报文长度
+    struct tcphdr *tcp_packet; //tcp报文地址
+
+    uint32_t udp_len; //udp报文长度
+    char *udp_packet; //udp报文地址
 
     uint8_t *payload;       //报文装载的数据区域
     uint32_t payload_len;   //报文装载的数据区域长度
 
 }dpi_pkt;
 
+
+/*  保存已探测的写 ip+port对 链接信息 */
+struct ipv4_port_pair {
+    uint32_t src_ip;
+    uint16_t src_port;
+    uint32_t dst_ip;
+    uint16_t dst_port;
+};
+
+
+//dpi的链接信息定义
+typedef struct dpi_connection {
+    struct ipv4_port_pair ipv4;
+
+    /* 根据需要添加 ...如果是ipv6 */
+    
+}dpi_connection;
+
+
+//对已经探测到的协议报文，保存IP+port 的链接信息
+int add_connection(struct dpi_result *res, struct dpi_pkt *pkt, dpi_protocol protocol);
+
+/*
+   ip + port 的比较，比较保存的当前的报文的ip_pair是否相同
+
+    return:
+        0: 相同
+        1: 不同
+ */
+int cmp_connection(struct dpi_result *res, struct dpi_pkt *pkt, dpi_protocol protocol);
+
+
+
+void init_connection_list();
+void destory_connection_list();
+void show_connections();
 
 
 //1 初始化
@@ -110,6 +143,6 @@ typedef int (*dpi_protocol_analyze_func_t)(dpi_result *res, dpi_pkt *pkt);
 
 
 //tcp应用层报文解析函数表
-dpi_protocol_analyze_func_t dpi_tcp_analyze_funcs[PROTOCOL_TCP_MAX];
+dpi_protocol_analyze_func_t dpi_tcp_analyze_funcs[PROTOCOL_MAX];
 
 

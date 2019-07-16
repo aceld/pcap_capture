@@ -14,13 +14,20 @@ int dpi_pkt_ssh(dpi_result *res, dpi_pkt *pkt)
 
     //保护措施，数据区域长度>4字节
     if (pkt->payload_len <= 4) {
-        DPI_LOG_ERROR("ssh payload_len <= 4");
+        //DPI_LOG_ERROR("ssh payload_len <= 4");
         return 0;
     }
 
 
     //识别ssh报文
     if (memcmp("SSH-", pkt->payload, 4) == 0) {
+        //将ssh协议连接保存 
+        add_connection(res, pkt, SSH);
+        return 1;
+    }
+
+    /* 判断 当前包ip+port 是否在已经探测的连接里 */
+    if (cmp_connection(res, pkt, SSH) == 0) {
         return 1;
     }
 

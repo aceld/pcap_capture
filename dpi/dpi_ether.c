@@ -28,6 +28,10 @@ dpi_result *dpi_init(const char *pcapfile)
     //将pcap打开文件产生的句柄也存到res句柄中，方便之后调用
     res->pcap_handle = handle;
 
+    /* 初始化 链接链表 */
+    init_connection_list();
+    
+
     return res;
 }
 
@@ -51,6 +55,9 @@ void dpi_destory(dpi_result *res)
 
     //释放自己的句柄
     free(res);
+
+    //销毁链接链表
+    destory_connection_list();
 }
 
 
