@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <pcap/pcap.h>
 #include "dpi.h"
 
 
@@ -9,31 +8,6 @@ void usage(const char *argv0)
     DPI_LOG_INFO("usage : %s <pcap_file>\n", argv0);
 }
 
-
-void displayResult(dpi_result *res)
-{
-    //链路层
-    printf("以太坊报文数量: %u\n", res->ether_count);
-
-    //IP层
-    printf("IP报文数量: %u\n", res->ip_count);
-
-
-    //传输层
-    printf("TCP报文数量: %u\n", res->tcp_count);
-    printf("UDP报文数量: %u\n", res->udp_count);
-
-    //tcp应用协议
-    printf("SSH报文数量: %u\n", res->tcp_protocol_count[SSH]);
-
-    //udp应用协议
-    printf("TFTP报文数量: %u\n", res->udp_protocol_count[TFTP]);
-    printf("NTP报文数量: %u\n", res->udp_protocol_count[NTP]);
-
-
-    //链接信息
-    show_connections();
-}
 
 
 int main(int argc, char *argv[])
@@ -47,11 +21,14 @@ int main(int argc, char *argv[])
     }
 
     //1 初始化
+    dpi_result *res = dpi_init_dev(argc, argv);
+#if 0
     dpi_result *res = dpi_init(argv[1]);
     if (!res) {
         DPI_LOG_ERROR("Errr in dpi_init\n");
         return -1;
     }
+#endif
 
     //2 业务处理
     dpi_loop(res);

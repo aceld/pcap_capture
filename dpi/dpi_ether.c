@@ -4,6 +4,74 @@
 #include <stdint.h>
 #include "dpi.h"
 
+#define SNAP_LEN 65536
+
+
+void displayResult(dpi_result *res)
+{
+    //链路层
+    printf("以太坊报文数量: %u\n", res->ether_count);
+
+    //ip层
+    printf("ip报文数量: %u\n", res->ip_count);
+
+
+    //传输层
+    printf("tcp报文数量: %u\n", res->tcp_count);
+    printf("udp报文数量: %u\n", res->udp_count);
+
+    //tcp应用协议
+    printf("ssh报文数量: %u\n", res->tcp_protocol_count[SSH]);
+
+    //udp应用协议
+    printf("tftp报文数量: %u\n", res->udp_protocol_count[TFTP]);
+    printf("ntp报文数量: %u\n", res->udp_protocol_count[NTP]);
+
+
+    //链接信息
+    show_connections();
+}
+
+
+dpi_result *dpi_init_dev(int argc, char **argv) 
+{
+    char errbuf[PCAP_ERRBUF_SIZE] = {0};//错误信息buffer
+    char *dev = NULL;                   //当前抓取的网卡设备
+    pcap_t *handle;                     //pcap句柄
+    
+    if (argc == 2) {
+        dev = argv[1];
+    }
+
+    handle = pcap_open_live(dev, SNAP_LEN, 1, 1000000, errbuf);
+    if (handle == NULL) {
+        DPI_LOG_ERROR("Error in pcap_open_live :%s\n", errbuf);
+        return NULL;
+    }
+
+
+    /* 确保 正在从一个网络设备上抓包 */
+    if (pcap_datalink(handle) != DLT_EN10MB) {
+        DPI_LOG_ERROR("%s is not an ethernet\n", dev);
+        return NULL;
+    }
+
+
+    //创建一个句柄
+    dpi_result *res = malloc(sizeof(dpi_result));
+    //重置为0
+    memset(res, 0, sizeof(*res));
+    //将pcap打开文件产生的句柄也存到res句柄中，方便之后调用
+    res->pcap_handle = handle;
+    res->dev = dev;
+
+    /* 初始化 链接链表 */
+    init_connection_list();
+
+
+    return res;
+}
+
 
 
 //1 初始化
@@ -14,6 +82,7 @@ dpi_result *dpi_init(const char *pcapfile)
 {
     //1 pcap 打开文件
     char errbuf[PCAP_ERRBUF_SIZE] = {0};//错误信息buffer
+
     pcap_t *handle = pcap_open_offline(pcapfile, errbuf);
     if (!handle) {
         //出错处理
@@ -118,5 +187,8 @@ void dpi_pcap_callback(u_char *user, const struct pcap_pkthdr *h, const u_char *
     } else if (pkt.ether_packet->ether_type == htons(0x8035)) {
         //RARP 报文
     }
+
+
+    displayResult(res);
 
 }

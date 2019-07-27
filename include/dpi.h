@@ -44,6 +44,7 @@ extern char *protocol_udp_string[PROTOCOL_UDP_MAX];
 //句柄定义
 typedef struct dpi_result 
 {
+    char *dev;                  //当前抓取的网卡设备
     void *pcap_handle;
     
     unsigned int ether_count; //以太坊报文数量
@@ -123,6 +124,8 @@ void show_connections();
 //返回值: 设计一个句柄，这个句柄包含了结果
 //成功返回非空的指针，失败，返回NULL
 dpi_result *dpi_init(const char *pcapfile);
+//1 实时抓包初始化
+dpi_result *dpi_init_dev(int argc, char **argv);
 
 //2 业务处理
 //启动执行报文的函数
@@ -130,6 +133,9 @@ void dpi_loop(dpi_result *res);
 
 //3 资源释放
 void dpi_destory(dpi_result *res);
+
+//4 打印当前抓包结果
+void displayResult(dpi_result *res);
 
 
 //处理以太网报文
