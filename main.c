@@ -21,8 +21,10 @@ int main(int argc, char *argv[])
     }
 
     //1 初始化
-    dpi_result *res = dpi_init_dev(argc, argv);
 #if 0
+    dpi_result *res = dpi_init_dev(argc, argv);
+#endif
+#if 1
     dpi_result *res = dpi_init(argv[1]);
     if (!res) {
         DPI_LOG_ERROR("Errr in dpi_init\n");

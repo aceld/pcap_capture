@@ -120,7 +120,7 @@ int cmp_connection(struct dpi_result *res, struct dpi_pkt *pkt, dpi_tcp_protocol
                 } 
             }
         }
-#if 0
+#if 1
         else if (sip == pkt->ip_packet->daddr) {
             /* B ---> A 的包 */
             if (dip == pkt->ip_packet->saddr) {
@@ -130,11 +130,6 @@ int cmp_connection(struct dpi_result *res, struct dpi_pkt *pkt, dpi_tcp_protocol
                         ret = 0;
                         goto END;
                     }
-                } else if (pkt->udp_packet != NULL) {
-                    /* udp协议 */
-
-                } else {
-                    /* nothing to do  */
                 }
             }
         } else {
